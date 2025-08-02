@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMA | Login y Registro</title>
+    <!-- Iconos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        /* --- ESTILOS CSS --- */
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f6f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        /* --- FONDO "RAMA" --- */
+        body::before {
+            content: 'RAMA';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25vw;
+            font-weight: 800;
+            color: rgba(0, 0, 0, 0.04);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        p {
+            font-size: 14px;
+            font-weight: 100;
+            line-height: 20px;
+            letter-spacing: 0.5px;
+            margin: 20px 0 30px;
+        }
+
+        span {
+            font-size: 12px;
+        }
+
+        a {
+            color: #333;
+            font-size: 14px;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        button {
+            border-radius: 20px;
+            border: 1px solid #FF4B2B;
+            background-color: #FF4B2B;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px 45px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 80ms ease-in;
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        button.ghost {
+            background-color: transparent;
+            border-color: #FFFFFF;
+        }
+
+        form {
+            background-color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+        }
+
+        input {
+            background-color: #eee;
+            border: none;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+                0 10px 10px rgba(0, 0, 0, 0.22);
+            position: relative;
+            overflow: hidden;
+            width: 768px;
+            max-width: 100%;
+            min-height: 580px;
+            /* Altura aumentada para los nuevos campos */
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* Contenedor del link "Olvidaste tu contraseña" */
+        .forgot-password-link {
+            cursor: pointer;
+            color: #333;
+            font-size: 14px;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        .forgot-password-link:hover {
+            text-decoration: underline;
+        }
+
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .overlay {
+            background: #FF416C;
+            background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
+            background: linear-gradient(to right, #FF4B2B, #FF416C);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #FFFFFF;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        /* --- ESTILOS PARA LA VENTANA MODAL DE RECUPERAR CONTRASEÑA --- */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            /* Oculto por defecto */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-container.show {
+            display: flex;
+            /* Se muestra con JS */
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-button:hover {
+            color: #333;
+        }
+
+
+        /* --- ANIMACIÓN DE MOVIMIENTO --- */
+        .container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+        }
+
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        @keyframes show {
+
+            0%,
+            49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+
+            50%,
+            100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ESTRUCTURA HTML DEL FORMULARIO -->
+    <div class="container" id="container">
+        <!-- FORMULARIO DE REGISTRO (ACTUALIZADO) -->
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Crear Cuenta</h1>
+                <input type="text" placeholder="Nombre" required />
+                <input type="text" placeholder="Apellido" required />
+                <input type="text" placeholder="Dirección de Casa" required />
+                <input type="tel" placeholder="Teléfono" required />
+                <input type="password" placeholder="Contraseña" required />
+                <input type="password" placeholder="Confirmar Contraseña" required />
+                <button>Registrarse</button>
+            </form>
+        </div>
+
+        <!-- FORMULARIO DE INICIO DE SESIÓN -->
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <h1>Iniciar Sesión</h1>
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Contraseña" required />
+                <!-- Enlace para abrir la ventana modal -->
+                <a href="#" id="forgotPasswordLink" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                <button>Iniciar Sesión</button>
+            </form>
+        </div>
+
+        <!-- PANELES DE SUPERPOSICIÓN (OVERLAY) -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>¡Bienvenido de vuelta!</h1>
+                    <p>Para mantenerte conectado, por favor inicia sesión con tu información personal</p>
+                    <button class="ghost" id="signIn">Iniciar Sesión</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>¡Hola, Amigo!</h1>
+                    <p>Introduce tus datos personales y comienza tu viaje con nosotros</p>
+                    <button class="ghost" id="signUp">Registrarse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VENTANA MODAL PARA RECUPERAR CONTRASEÑA -->
+    <div id="modalContainer" class="modal-container">
+        <div class="modal-content">
+            <span id="closeBtn" class="close-button">×</span>
+            <h2>Recuperar Contraseña</h2>
+            <p>Ingresa tu correo electrónico para enviarte un enlace de recuperación.</p>
+            <form action="#">
+                <input type="email" placeholder="Tu correo electrónico" required>
+                <button>Enviar</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        // --- CÓDIGO JAVASCRIPT ---
+
+        // 1. Lógica para el slider entre Login y Registro
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+
+        // 2. Lógica para la ventana modal de "Recuperar Contraseña"
+        const modalContainer = document.getElementById('modalContainer');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const closeBtn = document.getElementById('closeBtn');
+
+        // Abrir la ventana modal
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita que el link "#" mueva la página
+            modalContainer.classList.add('show');
+        });
+
+        // Cerrar la ventana modal con el botón de X
+        closeBtn.addEventListener('click', () => {
+            modalContainer.classList.remove('show');
+        });
+
+        // Cerrar la ventana modal haciendo clic fuera del contenido
+        window.addEventListener('click', (e) => {
+            if (e.target == modalContainer) {
+                modalContainer.classList.remove('show');
+            }
+        });
+
+        // conestar contenido 
+        const loginForm = document.getElementById('login-form');
+
+        // Nos aseguramos de que el formulario exista antes de añadir el evento
+        if (loginForm) {
+            loginForm.addEventListener('submit', function (event) {
+                // 1. Evitamos que la página se recargue
+                event.preventDefault();
+
+                // 2. Obtenemos los datos solo de los inputs de login
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                // 3. Comprobamos los datos (puedes usar estos para probar)
+                if (email === 'cliente@rama.com' && password === '12345') {
+
+                    // 4. Guardamos la "prueba" del login y redirigimos
+                    localStorage.setItem('ramaUserLoggedIn', 'true');
+                    localStorage.setItem('ramaUsername', 'Cliente Fiel');
+                    alert('¡Bienvenido! Redirigiendo a la tienda...');
+                    window.location.href = 'RAMA.html';
+
+                } else {
+                    alert('Email o contraseña incorrectos.');
+                }
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
